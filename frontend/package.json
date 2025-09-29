@@ -1,0 +1,58 @@
+{
+  "name": "krishiconnect-frontend",
+  "version": "1.0.0",
+  "description": "KrishiConnect Frontend - Connecting farmers with customers",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^14.2.0",
+    "@ant-design/icons": "^5.3.7",
+    "@ant-design/nextjs-registry": "^1.0.0",
+    "antd": "^5.18.0",
+    "axios": "^1.7.2",
+    "chart.js": "^4.4.7",
+    "react-chartjs-2": "^5.2.0",
+    "react-hook-form": "^7.48.2",
+    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query-devtools": "^5.0.0",
+    "js-cookie": "^3.0.5",
+    "dayjs": "^1.11.10",
+    "lodash": "^4.17.21",
+    "react-hot-toast": "^2.4.1",
+    "framer-motion": "^10.16.16",
+    "zustand": "^4.4.7",
+    "react-dropzone": "^14.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "@eslint/eslintrc": "^3",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/js-cookie": "^3.0.6",
+    "@types/lodash": "^4.14.202"
+  },
+  "resolutions": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "overrides": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
