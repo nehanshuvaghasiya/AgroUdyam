@@ -187,9 +187,9 @@ export const AppHeader = () => {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-2">
-                <span className="text-white font-bold text-lg">K</span>
+                <span className="text-white font-bold text-lg">A</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">KrishiConnect</span>
+              <span className="text-xl font-bold text-gray-900">AgroUdyam</span>
             </Link>
           </div>
 

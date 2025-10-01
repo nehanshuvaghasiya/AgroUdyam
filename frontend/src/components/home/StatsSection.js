@@ -1,51 +1,124 @@
 'use client';
 
-import { Typography, Row, Col, Statistic } from 'antd';
+import { Typography } from 'antd';
 import { 
-  TeamOutlined, 
-  ShopOutlined, 
-  ShoppingCartOutlined,
-  TrophyOutlined
+  UserOutlined,
+  ShopOutlined,
+  ShoppingOutlined,
+  TrophyOutlined,
+  RiseOutlined,
+  GlobalOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 const { Title, Text } = Typography;
 
 export const StatsSection = () => {
+  const [counters, setCounters] = useState({
+    farmers: 0,
+    customers: 0,
+    orders: 0,
+    products: 0,
+  });
+
+  const finalStats = {
+    farmers: 500,
+    customers: 10000,
+    orders: 50000,
+    products: 1000,
+  };
+
+  useEffect(() => {
+    const duration = 2000; // 2 seconds
+    const steps = 60;
+    const interval = duration / steps;
+
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+
+      setCounters({
+        farmers: Math.floor(finalStats.farmers * progress),
+        customers: Math.floor(finalStats.customers * progress),
+        orders: Math.floor(finalStats.orders * progress),
+        products: Math.floor(finalStats.products * progress),
+      });
+
+      if (step >= steps) {
+        clearInterval(timer);
+        setCounters(finalStats);
+      }
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const stats = [
     {
-      icon: <TeamOutlined className="text-4xl text-green-500" />,
-      title: 'Partner Farmers',
-      value: '500+',
-      description: 'Active farmers across India',
-      color: 'text-green-600',
+      icon: <ShopOutlined />,
+      value: `${counters.farmers}+`,
+      label: 'Local Farmers',
+      description: 'Trusted farming partners',
+      color: 'from-green-500 to-emerald-500',
+      bgColor: 'bg-green-50',
     },
     {
-      icon: <ShopOutlined className="text-4xl text-blue-500" />,
-      title: 'Products Available',
-      value: '1000+',
-      description: 'Fresh produce items',
-      color: 'text-blue-600',
+      icon: <UserOutlined />,
+      value: `${(counters.customers / 1000).toFixed(0)}K+`,
+      label: 'Happy Customers',
+      description: 'Satisfied buyers nationwide',
+      color: 'from-blue-500 to-cyan-500',
+      bgColor: 'bg-blue-50',
     },
     {
-      icon: <ShoppingCartOutlined className="text-4xl text-orange-500" />,
-      title: 'Orders Delivered',
-      value: '50K+',
-      description: 'Successful deliveries',
-      color: 'text-orange-600',
+      icon: <ShoppingOutlined />,
+      value: `${(counters.orders / 1000).toFixed(0)}K+`,
+      label: 'Orders Delivered',
+      description: 'Successfully completed orders',
+      color: 'from-purple-500 to-pink-500',
+      bgColor: 'bg-purple-50',
     },
     {
-      icon: <TrophyOutlined className="text-4xl text-purple-500" />,
-      title: 'Customer Satisfaction',
-      value: '98%',
-      description: 'Happy customers',
-      color: 'text-purple-600',
+      icon: <TrophyOutlined />,
+      value: `${counters.products}+`,
+      label: 'Products Available',
+      description: 'Fresh produce variety',
+      color: 'from-orange-500 to-red-500',
+      bgColor: 'bg-orange-50',
+    },
+  ];
+
+  const achievements = [
+    {
+      icon: <RiseOutlined />,
+      title: '98% Customer Satisfaction',
+      description: 'Based on 10,000+ reviews',
+    },
+    {
+      icon: <GlobalOutlined />,
+      title: 'Available in 50+ Cities',
+      description: 'Expanding across India',
+    },
+    {
+      icon: <TrophyOutlined />,
+      title: 'Award-Winning Platform',
+      description: 'Best Agri-Tech Startup 2024',
     },
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-r from-green-500 to-green-600">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 bg-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle, #10b981 1px, transparent 1px)',
+          backgroundSize: '30px 30px'
+        }} />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -54,72 +127,68 @@ export const StatsSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <Title level={2} className="text-white mb-4">
+          <Title level={2} className="!text-4xl !font-bold !text-gray-900 !mb-4">
             Our Impact in Numbers
           </Title>
-          <Text className="text-green-100 text-lg">
-            Building a sustainable future for agriculture
+          <Text className="!text-lg !text-gray-600">
+            Growing together with our farming community
           </Text>
         </motion.div>
 
         {/* Stats Grid */}
-        <Row gutter={[32, 32]}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {stats.map((stat, index) => (
-            <Col xs={12} sm={6} key={index}>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20">
-                  {/* Icon */}
-                  <div className="flex justify-center mb-4">
-                    {stat.icon}
-                  </div>
-
-                  {/* Statistic */}
-                  <Statistic
-                    title={<span className="text-white text-sm font-medium">{stat.title}</span>}
-                    value={stat.value}
-                    valueStyle={{ 
-                      color: '#ffffff', 
-                      fontSize: '2.5rem', 
-                      fontWeight: 'bold',
-                      textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}
-                  />
-
-                  {/* Description */}
-                  <Text className="text-green-100 text-sm mt-2 block">
-                    {stat.description}
-                  </Text>
-                </div>
-              </motion.div>
-            </Col>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className={`${stat.bgColor} rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-gray-200 group`}
+            >
+              <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center text-white text-3xl group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                {stat.icon}
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-2">
+                {stat.value}
+              </div>
+              <div className="text-lg font-semibold text-gray-700 mb-2">
+                {stat.label}
+              </div>
+              <div className="text-sm text-gray-500">
+                {stat.description}
+              </div>
+            </motion.div>
           ))}
-        </Row>
+        </div>
 
-        {/* Additional Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20 max-w-4xl mx-auto">
-            <Title level={3} className="text-white mb-4">
-              Join the KrishiConnect Community
-            </Title>
-            <Text className="text-green-100 text-lg leading-relaxed">
-              Be part of a growing community that's transforming agriculture in India. 
-              Whether you're a farmer looking to expand your reach or a customer seeking 
-              fresh, quality produce, KrishiConnect is your gateway to a better food system.
-            </Text>
-          </div>
-        </motion.div>
+        {/* Achievements */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {achievements.map((achievement, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-gray-50 to-green-50 rounded-xl p-6 border-2 border-gray-100 hover:border-green-200 transition-all duration-300"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0">
+                  {achievement.icon}
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">
+                    {achievement.title}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {achievement.description}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

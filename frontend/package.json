@@ -1,7 +1,7 @@
 {
-  "name": "krishiconnect-frontend",
+  "name": "agroudyam-frontend",
   "version": "1.0.0",
-  "description": "KrishiConnect Frontend - Connecting farmers with customers",
+  "description": "AgroUdyam Frontend - Connecting farmers with customers",
   "private": true,
   "scripts": {
     "dev": "next dev",

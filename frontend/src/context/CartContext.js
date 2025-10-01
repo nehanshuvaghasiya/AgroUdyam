@@ -91,21 +91,21 @@ export const CartProvider = ({ children }) => {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('krishiconnect_cart');
+    const savedCart = localStorage.getItem('agroudyam_cart');
     if (savedCart) {
       try {
         const cartItems = JSON.parse(savedCart);
         dispatch({ type: 'SET_CART', payload: cartItems });
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
-        localStorage.removeItem('krishiconnect_cart');
+        localStorage.removeItem('agroudyam_cart');
       }
     }
   }, []);
 
   // Save cart to localStorage whenever items change
   useEffect(() => {
-    localStorage.setItem('krishiconnect_cart', JSON.stringify(state.items));
+    localStorage.setItem('agroudyam_cart', JSON.stringify(state.items));
   }, [state.items]);
 
   // Add item to cart

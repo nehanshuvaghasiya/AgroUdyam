@@ -47,4 +47,10 @@ Form.Provider = AntForm.Provider;
 // Form.ErrorList wrapper
 Form.ErrorList = AntForm.ErrorList;
 
+// Form.useForm hook
+Form.useForm = AntForm.useForm;
+
+// Form.useWatch hook
+Form.useWatch = AntForm.useWatch;
+
 export default Form;

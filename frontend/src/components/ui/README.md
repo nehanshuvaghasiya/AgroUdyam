@@ -1,6 +1,6 @@
-# KrishiConnect UI Components
+# AgroUdyam UI Components
 
-This directory contains centralized Ant Design components for consistent usage across the KrishiConnect application.
+This directory contains centralized Ant Design components for consistent usage across the AgroUdyam application.
 
 ## 🎯 Purpose
 
@@ -9,7 +9,7 @@ All Ant Design components are wrapped and configured in one place to ensure:
 - **Centralized theme management**
 - **Easy maintenance** and updates
 - **Type safety** and better developer experience
-- **Custom branding** for KrishiConnect
+- **Custom branding** for AgroUdyam
 
 ## 📁 Structure
 
@@ -118,7 +118,7 @@ Notification.success({
 
 ## 🎨 Theme Configuration
 
-The theme is configured in `theme.js` with KrishiConnect branding:
+The theme is configured in `theme.js` with AgroUdyam branding:
 
 - **Primary Color**: Green (#52c41a) - representing agriculture/nature
 - **Success Color**: Green (#52c41a)
@@ -229,4 +229,4 @@ import { Button, Input } from '@/components/ui';
 - **Maintainability**: Changes in one place affect the entire app
 - **Performance**: Optimized imports and tree-shaking
 - **Developer Experience**: Better IntelliSense and type safety
-- **Branding**: Consistent KrishiConnect look and feel
+- **Branding**: Consistent AgroUdyam look and feel

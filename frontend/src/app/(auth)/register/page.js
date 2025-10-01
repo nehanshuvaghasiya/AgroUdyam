@@ -64,6 +64,7 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [userType, setUserType] = useState('customer');
+  const [formData, setFormData] = useState({});
   const [form] = Form.useForm();
   const { register } = useAuth();
   const router = useRouter();
@@ -100,12 +101,33 @@ function RegisterForm() {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const userData = {
-        ...values,
-        role: userType === 'farmer' ? 'farmer' : 'customer',
-        userType: userType
-      };
+      // Use formData from state instead of values parameter
+      console.log('Form values received:', values);
+      console.log('FormData from state:', formData);
       
+      // Format data to match backend expectations
+      const userData = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: {
+          street: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.pincode,
+          country: 'India'
+        },
+        role: formData.userType === 'farmer' ? 'farmer' : 'customer',
+        userType: formData.userType
+      };
+
+      // Add farm name for farmers
+      if (formData.userType === 'farmer' && formData.farmName) {
+        userData.farmName = formData.farmName;
+      }
+      
+      console.log('Sending registration data:', userData);
       const result = await register(userData);
       if (result.success) {
         toast.success('Registration successful!');
@@ -113,6 +135,7 @@ function RegisterForm() {
       }
     } catch (error) {
       console.error('Registration error:', error);
+      toast.error(error.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -120,11 +143,35 @@ function RegisterForm() {
 
   const nextStep = () => {
     if (currentStep === 0) {
+      // Step 0: User type selection, no validation needed
+      setFormData(prev => ({ ...prev, userType }));
       setCurrentStep(currentStep + 1);
-    } else {
-      form.validateFields().then(() => {
-        setCurrentStep(currentStep + 1);
-      });
+    } else if (currentStep === 1) {
+      // Step 1: Personal info - validate only current step fields
+      form.validateFields(['firstName', 'lastName', 'email', 'password', 'confirmPassword'])
+        .then((values) => {
+          console.log('Step 1 values:', values);
+          setFormData(prev => ({ ...prev, ...values }));
+          setCurrentStep(currentStep + 1);
+        })
+        .catch((err) => {
+          console.log('Validation failed:', err);
+        });
+    } else if (currentStep === 2) {
+      // Step 2: Contact details - validate only current step fields
+      const fieldsToValidate = userType === 'farmer' 
+        ? ['phone', 'address', 'city', 'state', 'pincode', 'farmName']
+        : ['phone', 'address', 'city', 'state', 'pincode'];
+      
+      form.validateFields(fieldsToValidate)
+        .then((values) => {
+          console.log('Step 2 values:', values);
+          setFormData(prev => ({ ...prev, ...values }));
+          setCurrentStep(currentStep + 1);
+        })
+        .catch((err) => {
+          console.log('Validation failed:', err);
+        });
     }
   };
 
@@ -175,7 +222,7 @@ function RegisterForm() {
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="w-20 h-20 bg-gradient-to-r from-green-500 via-green-600 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto lg:mx-0 mb-8 shadow-2xl"
               >
-                <span className="text-white font-bold text-3xl">K</span>
+                <span className="text-white font-bold text-3xl">A</span>
               </motion.div>
 
               <motion.h1 
@@ -184,7 +231,7 @@ function RegisterForm() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                Join KrishiConnect
+                Join AgroUdyam
               </motion.h1>
 
               <motion.p 

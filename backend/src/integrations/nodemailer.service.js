@@ -17,12 +17,12 @@ const createTransporter = () => {
 // Email templates
 const emailTemplates = {
   welcome: {
-    subject: 'Welcome to KrishiConnect!',
+    subject: 'Welcome to AgroUdyam!',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2e7d32;">Welcome to KrishiConnect!</h2>
+        <h2 style="color: #2e7d32;">Welcome to AgroUdyam!</h2>
         <p>Hello {{name}},</p>
-        <p>Welcome to KrishiConnect! We're excited to have you join our community of farmers and customers.</p>
+        <p>Welcome to AgroUdyam! We're excited to have you join our community of farmers and customers.</p>
         <p>You can now:</p>
         <ul>
           <li>Browse fresh produce from local farmers</li>
@@ -31,12 +31,12 @@ const emailTemplates = {
           <li>Leave reviews and ratings</li>
         </ul>
         <p>If you have any questions, feel free to contact our support team.</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   order_confirmation: {
-    subject: 'Order Confirmation - KrishiConnect',
+    subject: 'Order Confirmation - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2e7d32;">Order Confirmed!</h2>
@@ -45,13 +45,13 @@ const emailTemplates = {
         <p><strong>Order Number:</strong> {{orderNumber}}</p>
         <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
         <p>We'll notify you when your order is shipped.</p>
-        <p>Thank you for choosing KrishiConnect!</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Thank you for choosing AgroUdyam!</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   order_shipped: {
-    subject: 'Your Order Has Been Shipped - KrishiConnect',
+    subject: 'Your Order Has Been Shipped - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2e7d32;">Your Order Has Been Shipped!</h2>
@@ -60,13 +60,13 @@ const emailTemplates = {
         <p><strong>Order Number:</strong> {{orderNumber}}</p>
         <p><strong>Tracking Number:</strong> {{trackingNumber}}</p>
         <p>Expected delivery: {{expectedDelivery}}</p>
-        <p>Thank you for choosing KrishiConnect!</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Thank you for choosing AgroUdyam!</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   order_delivered: {
-    subject: 'Order Delivered - KrishiConnect',
+    subject: 'Order Delivered - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2e7d32;">Order Delivered!</h2>
@@ -74,42 +74,42 @@ const emailTemplates = {
         <p>Your order has been successfully delivered!</p>
         <p><strong>Order Number:</strong> {{orderNumber}}</p>
         <p>We hope you enjoy your fresh produce. Please consider leaving a review to help other customers.</p>
-        <p>Thank you for choosing KrishiConnect!</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Thank you for choosing AgroUdyam!</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   password_reset: {
-    subject: 'Password Reset Request - KrishiConnect',
+    subject: 'Password Reset Request - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2e7d32;">Password Reset Request</h2>
         <p>Hello {{name}},</p>
-        <p>You requested a password reset for your KrishiConnect account.</p>
+        <p>You requested a password reset for your AgroUdyam account.</p>
         <p>Click the link below to reset your password:</p>
         <a href="{{resetLink}}" style="background-color: #2e7d32; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a>
         <p>This link will expire in 1 hour.</p>
         <p>If you didn't request this, please ignore this email.</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   staff_invitation: {
-    subject: 'Invitation to Join Farm - KrishiConnect',
+    subject: 'Invitation to Join Farm - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2e7d32;">Farm Invitation</h2>
         <p>Hello,</p>
-        <p>You have been invited to join <strong>{{farmName}}</strong> on KrishiConnect as a {{role}}.</p>
+        <p>You have been invited to join <strong>{{farmName}}</strong> on AgroUdyam as a {{role}}.</p>
         <p>{{message}}</p>
         <p>Click the link below to accept the invitation:</p>
         <a href="{{invitationLink}}" style="background-color: #2e7d32; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Accept Invitation</a>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   payout_approved: {
-    subject: 'Payout Approved - KrishiConnect',
+    subject: 'Payout Approved - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2e7d32;">Payout Approved!</h2>
@@ -118,13 +118,13 @@ const emailTemplates = {
         <p><strong>Amount:</strong> ₹{{amount}}</p>
         <p><strong>Request ID:</strong> {{requestId}}</p>
         <p>The amount will be transferred to your registered bank account within 2-3 business days.</p>
-        <p>Thank you for being part of KrishiConnect!</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Thank you for being part of AgroUdyam!</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   },
   payout_rejected: {
-    subject: 'Payout Request Update - KrishiConnect',
+    subject: 'Payout Request Update - AgroUdyam',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #d32f2f;">Payout Request Update</h2>
@@ -133,7 +133,7 @@ const emailTemplates = {
         <p><strong>Request ID:</strong> {{requestId}}</p>
         <p><strong>Reason:</strong> {{reason}}</p>
         <p>Please contact support if you have any questions.</p>
-        <p>Best regards,<br>The KrishiConnect Team</p>
+        <p>Best regards,<br>The AgroUdyam Team</p>
       </div>
     `
   }

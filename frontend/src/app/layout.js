@@ -2,22 +2,22 @@ import { Providers } from '@/components/providers/Providers';
 import '@/app/globals.css';
 
 export const metadata = {
-  title: 'KrishiConnect - Fresh Produce from Farm to Table',
+  title: 'AgroUdyam - Fresh Produce from Farm to Table',
   description: 'Connect directly with local farmers and get fresh, organic produce delivered to your doorstep.',
   keywords: 'fresh produce, organic food, local farmers, farm to table, agriculture',
-  authors: [{ name: 'KrishiConnect Team' }],
+  authors: [{ name: 'AgroUdyam Team' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
-    title: 'KrishiConnect - Fresh Produce from Farm to Table',
+    title: 'AgroUdyam - Fresh Produce from Farm to Table',
     description: 'Connect directly with local farmers and get fresh, organic produce delivered to your doorstep.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'KrishiConnect',
+    siteName: 'AgroUdyam',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KrishiConnect - Fresh Produce from Farm to Table',
+    title: 'AgroUdyam - Fresh Produce from Farm to Table',
     description: 'Connect directly with local farmers and get fresh, organic produce delivered to your doorstep.',
   },
 };

@@ -38,4 +38,10 @@ const Input = ({
   );
 };
 
+// Input sub-components
+Input.Password = AntInput.Password;
+Input.TextArea = AntInput.TextArea;
+Input.Search = AntInput.Search;
+Input.Group = AntInput.Group;
+
 export default Input;

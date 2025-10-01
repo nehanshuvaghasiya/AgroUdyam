@@ -111,7 +111,7 @@ const ExampleComponent = () => {
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {/* Alert Example */}
           <Alert
-            message="Welcome to KrishiConnect!"
+            message="Welcome to AgroUdyam!"
             description="This is an example of how to use our centralized UI components."
             type="success"
             showIcon

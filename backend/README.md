@@ -1,6 +1,6 @@
-# KrishiConnect Backend API
+# AgroUdyam Backend API
 
-A comprehensive Node.js backend API for KrishiConnect - a platform connecting farmers with customers for fresh produce delivery.
+A comprehensive Node.js backend API for AgroUdyam - a platform connecting farmers with customers for fresh produce delivery.
 
 ## 🚀 Features
 
@@ -420,7 +420,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-For support, email support@krishiconnect.com or create an issue in the repository.
+For support, email support@agroudyam.com or create an issue in the repository.
 
 ## 🔄 Version History
 

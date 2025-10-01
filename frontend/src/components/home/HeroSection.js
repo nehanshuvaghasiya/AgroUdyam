@@ -1,136 +1,146 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button, Typography, Row, Col, Space, Statistic } from 'antd';
+import { Typography } from 'antd';
 import { 
   ShoppingCartOutlined, 
   TruckOutlined, 
   SafetyOutlined,
   HeartOutlined,
-  ArrowRightOutlined,
-  PlayCircleOutlined
+  RocketOutlined,
+  CheckCircleOutlined
 } from '@ant-design/icons';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui';
 
 const { Title, Paragraph } = Typography;
 
 export const HeroSection = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-  const heroImages = [
-    '/images/hero-farmers.jpg',
-    '/images/hero-vegetables.jpg',
-    '/images/hero-fresh-produce.jpg',
-  ];
-
-  const stats = [
-    { title: 'Farmers Connected', value: '500+', suffix: '' },
-    { title: 'Products Available', value: '1000+', suffix: '' },
-    { title: 'Happy Customers', value: '10K+', suffix: '' },
-    { title: 'Orders Delivered', value: '50K+', suffix: '' },
-  ];
-
   const features = [
     {
-      icon: <TruckOutlined className="text-2xl text-green-500" />,
+      icon: <TruckOutlined />,
       title: 'Fast Delivery',
-      description: 'Fresh produce delivered within 24 hours',
+      description: 'Get fresh produce within 24 hours',
     },
     {
-      icon: <SafetyOutlined className="text-2xl text-green-500" />,
+      icon: <SafetyOutlined />,
       title: 'Quality Assured',
-      description: 'Direct from farm, quality guaranteed',
+      description: 'Direct from farm, premium quality',
     },
     {
-      icon: <HeartOutlined className="text-2xl text-green-500" />,
+      icon: <HeartOutlined />,
       title: 'Support Farmers',
-      description: 'Help local farmers grow their business',
+      description: 'Empowering local agriculture',
     },
   ];
 
-  // Auto-rotate hero images
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Images */}
-      <div className="absolute inset-0 z-0">
-        {heroImages.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
-              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              backgroundImage: `url(${image})`,
-            }}
-          />
-        ))}
-        <div className="absolute inset-0 bg-black bg-opacity-40" />
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 pt-20">
+      {/* Animated Background Shapes */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity }}
+          className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full opacity-20 blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [90, 0, 90],
+          }}
+          transition={{ duration: 20, repeat: Infinity, delay: 5 }}
+          className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-200 rounded-full opacity-20 blur-3xl"
+        />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-100 rounded-full opacity-10 blur-3xl" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <Row gutter={[48, 48]} align="middle">
-          <Col xs={24} lg={12}>
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left Column - Hero Text */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Badge */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-white"
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full mb-6"
             >
-              <Title level={1} className="text-white text-4xl md:text-6xl font-bold mb-6">
-                Fresh Produce
-                <br />
-                <span className="text-green-400">From Farm to Table</span>
-              </Title>
-              
-              <Paragraph className="text-xl text-gray-200 mb-8 max-w-2xl">
-                Connect directly with local farmers and get the freshest, 
-                organic produce delivered to your doorstep. Support sustainable 
-                agriculture while enjoying premium quality food.
-              </Paragraph>
-
-              <Space size="large" wrap>
-                <Link href="/products">
-                  <Button 
-                    type="primary" 
-                    size="large"
-                    className="bg-green-500 hover:bg-green-600 border-green-500 hover:border-green-600 h-12 px-8 text-lg font-semibold"
-                    icon={<ShoppingCartOutlined />}
-                  >
-                    Shop Now
-                  </Button>
-                </Link>
-                
-                <Button 
-                  type="default" 
-                  size="large"
-                  className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900 h-12 px-8 text-lg font-semibold"
-                  icon={<PlayCircleOutlined />}
-                >
-                  Watch Video
-                </Button>
-              </Space>
+              <RocketOutlined />
+              <span className="text-sm font-semibold">Fresh From Farm to Your Table</span>
             </motion.div>
-          </Col>
 
-          <Col xs={24} lg={12}>
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20"
-            >
-              <Title level={3} className="text-white mb-6 text-center">
-                Why Choose KrishiConnect?
-              </Title>
+            <Title level={1} className="!text-5xl md:!text-6xl !font-bold !mb-6 !text-gray-900">
+              Premium Fresh
+              <br />
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                Organic Produce
+              </span>
+            </Title>
+            
+            <Paragraph className="!text-xl !text-gray-600 !mb-8 !leading-relaxed">
+              Connect directly with local farmers and enjoy the freshest organic produce 
+              delivered to your doorstep. Support sustainable agriculture while nourishing 
+              your family with quality food.
+            </Paragraph>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 mb-12">
+              <Link href="/products">
+                <Button 
+                  type="primary" 
+                  size="large"
+                  className="!h-14 !px-8 !text-lg !font-semibold !bg-gradient-to-r !from-green-600 !to-emerald-600 hover:!from-green-700 hover:!to-emerald-700 !border-0 !rounded-xl !shadow-lg hover:!shadow-xl transition-all"
+                  icon={<ShoppingCartOutlined />}
+                >
+                  Shop Now
+                </Button>
+              </Link>
+              
+              <Link href="/about">
+                <Button 
+                  size="large"
+                  className="!h-14 !px-8 !text-lg !font-semibold !bg-white !text-gray-700 hover:!bg-gray-50 !border-2 !border-gray-200 !rounded-xl !shadow-md hover:!shadow-lg transition-all"
+                >
+                  Learn More
+                </Button>
+              </Link>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="flex flex-wrap items-center gap-8 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <CheckCircleOutlined className="text-green-600 text-lg" />
+                <span>500+ Local Farmers</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircleOutlined className="text-green-600 text-lg" />
+                <span>10K+ Happy Customers</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircleOutlined className="text-green-600 text-lg" />
+                <span>100% Organic</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column - Feature Cards */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            {/* Main Image Card */}
+            <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden p-8 border border-gray-100">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400 to-emerald-400 rounded-full opacity-10 blur-2xl" />
               
               <div className="space-y-6">
                 {features.map((feature, index) => (
@@ -139,72 +149,50 @@ export const HeroSection = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                    className="flex items-start space-x-4"
+                    className="flex items-start gap-4 p-5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl hover:shadow-md transition-all duration-300 cursor-pointer group"
                   >
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform">
                       {feature.icon}
                     </div>
                     <div>
-                      <h4 className="text-white font-semibold text-lg mb-1">
+                      <h4 className="text-gray-900 font-bold text-lg mb-1">
                         {feature.title}
                       </h4>
-                      <p className="text-gray-200 text-sm">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         {feature.description}
                       </p>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </motion.div>
-          </Col>
-        </Row>
 
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-20"
-        >
-          <Row gutter={[32, 32]} className="text-center">
-            {stats.map((stat, index) => (
-              <Col xs={12} sm={6} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
-                  className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20"
-                >
-                  <Statistic
-                    title={<span className="text-white text-sm">{stat.title}</span>}
-                    value={stat.value}
-                    suffix={stat.suffix}
-                    valueStyle={{ color: '#52c41a', fontSize: '2rem', fontWeight: 'bold' }}
-                  />
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
-        </motion.div>
-      </div>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-3 gap-4 mt-8">
+                {[
+                  { value: '500+', label: 'Farmers' },
+                  { value: '1000+', label: 'Products' },
+                  { value: '50K+', label: 'Orders' },
+                ].map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
+                    className="bg-white border-2 border-green-100 rounded-xl p-4 text-center hover:border-green-300 transition-all"
+                  >
+                    <div className="text-2xl font-bold text-green-600">{stat.value}</div>
+                    <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10"
-      >
-        <div className="flex flex-col items-center text-white">
-          <span className="text-sm mb-2">Scroll to explore</span>
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <ArrowRightOutlined className="text-xl transform rotate-90" />
+            {/* Decorative Elements */}
+            <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl opacity-80 rotate-12" />
+            <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-400 rounded-2xl opacity-80 -rotate-12" />
           </motion.div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 };

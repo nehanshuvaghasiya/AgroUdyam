@@ -82,8 +82,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await authService.register(userData);
-      
-      if (response.success) {
+        console.log("response",response);
+      if (response?.success) {
         const { user: newUser, token, refreshToken } = response.data;
         
         // Store tokens in cookies
@@ -99,6 +99,9 @@ export const AuthProvider = ({ children }) => {
         redirectBasedOnRole(newUser.role?.name);
         
         return { success: true };
+      }else{
+        toast.error(response?.message || 'Registration failed');
+        return { success: false, error: response?.message || 'Registration failed' };
       }
     } catch (error) {
       console.error('Registration error:', error);

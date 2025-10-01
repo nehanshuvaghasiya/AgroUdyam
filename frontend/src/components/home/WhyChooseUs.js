@@ -1,13 +1,15 @@
 'use client';
 
-import { Typography, Row, Col, Card, Space } from 'antd';
+import { Typography } from 'antd';
 import { 
-  TruckOutlined, 
-  SafetyOutlined, 
+  TruckOutlined,
+  SafetyOutlined,
   HeartOutlined,
-  TeamOutlined,
   DollarOutlined,
-  ClockCircleOutlined
+  CustomerServiceOutlined,
+  ThunderboltOutlined,
+  CheckCircleOutlined,
+  StarOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
@@ -16,46 +18,57 @@ const { Title, Text } = Typography;
 export const WhyChooseUs = () => {
   const features = [
     {
-      icon: <TruckOutlined className="text-4xl text-green-500" />,
-      title: 'Fast Delivery',
-      description: 'Get your fresh produce delivered within 24 hours directly from the farm to your doorstep.',
-      highlight: '24h Delivery',
+      icon: <TruckOutlined />,
+      title: 'Fast & Free Delivery',
+      description: 'Get your orders delivered within 24 hours with no delivery charges on orders above ₹500',
+      color: 'from-blue-500 to-cyan-500',
     },
     {
-      icon: <SafetyOutlined className="text-4xl text-blue-500" />,
-      title: 'Quality Assured',
-      description: 'Every product is carefully selected and quality-checked to ensure you get the best.',
-      highlight: '100% Fresh',
+      icon: <SafetyOutlined />,
+      title: '100% Quality Guarantee',
+      description: 'All products are quality checked and sourced directly from verified organic farms',
+      color: 'from-green-500 to-emerald-500',
     },
     {
-      icon: <HeartOutlined className="text-4xl text-red-500" />,
-      title: 'Support Farmers',
-      description: 'Help local farmers grow their business by buying directly from them.',
-      highlight: 'Direct Trade',
+      icon: <HeartOutlined />,
+      title: 'Support Local Farmers',
+      description: 'Every purchase directly supports local farmers and sustainable agriculture practices',
+      color: 'from-red-500 to-pink-500',
     },
     {
-      icon: <TeamOutlined className="text-4xl text-purple-500" />,
-      title: 'Community Driven',
-      description: 'Join a community that values sustainable agriculture and fresh, healthy food.',
-      highlight: 'Community',
+      icon: <DollarOutlined />,
+      title: 'Best Prices',
+      description: 'No middlemen means better prices for you and fair prices for our farmers',
+      color: 'from-yellow-500 to-orange-500',
     },
     {
-      icon: <DollarOutlined className="text-4xl text-orange-500" />,
-      title: 'Fair Prices',
-      description: 'Get competitive prices without middlemen, ensuring fair compensation for farmers.',
-      highlight: 'Fair Trade',
+      icon: <CustomerServiceOutlined />,
+      title: '24/7 Customer Support',
+      description: 'Our dedicated support team is always here to help you with any questions',
+      color: 'from-purple-500 to-indigo-500',
     },
     {
-      icon: <ClockCircleOutlined className="text-4xl text-cyan-500" />,
-      title: 'Always Available',
-      description: 'Shop anytime, anywhere with our 24/7 online platform and reliable service.',
-      highlight: '24/7 Service',
+      icon: <ThunderboltOutlined />,
+      title: 'Fresh from Farm',
+      description: 'Products harvested fresh and delivered to you within hours of picking',
+      color: 'from-teal-500 to-green-500',
     },
   ];
 
+  const benefits = [
+    'Organic & Pesticide-free',
+    'Farm-fresh Quality',
+    'Fair Trade Pricing',
+    'Eco-friendly Packaging',
+  ];
+
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 relative overflow-hidden">
+      {/* Background Decorations */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-green-200 rounded-full opacity-10 blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-emerald-200 rounded-full opacity-10 blur-3xl" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -64,98 +77,93 @@ export const WhyChooseUs = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <Title level={2} className="text-gray-900 mb-4">
-            Why Choose KrishiConnect?
+          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full mb-4">
+            <StarOutlined />
+            <span className="text-sm font-semibold">Why Choose Us</span>
+          </div>
+          <Title level={2} className="!text-4xl !font-bold !text-gray-900 !mb-4">
+            The AgroUdyam Advantage
           </Title>
-          <Text className="text-gray-600 text-lg max-w-2xl mx-auto">
-            We're committed to providing the best experience for both farmers and customers, 
-            creating a sustainable ecosystem for fresh produce.
+          <Text className="!text-lg !text-gray-600 max-w-2xl mx-auto block">
+            We connect you directly with local farmers, ensuring the freshest produce 
+            while supporting sustainable agriculture
           </Text>
         </motion.div>
 
         {/* Features Grid */}
-        <Row gutter={[32, 32]}>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {features.map((feature, index) => (
-            <Col xs={24} sm={12} lg={8} key={index}>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card
-                  className="h-full text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2"
-                  styles={{ body: { padding: '32px 24px' } }}
-                >
-                  <div className="space-y-4">
-                    {/* Icon */}
-                    <div className="flex justify-center">
-                      {feature.icon}
-                    </div>
-
-                    {/* Highlight Badge */}
-                    <div className="inline-block">
-                      <span className="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
-                        {feature.highlight}
-                      </span>
-                    </div>
-
-                    {/* Content */}
-                    <div>
-                      <Title level={4} className="text-gray-900 mb-3">
-                        {feature.title}
-                      </Title>
-                      <Text className="text-gray-600 leading-relaxed">
-                        {feature.description}
-                      </Text>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            </Col>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 group"
+            >
+              <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-white text-3xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                {feature.description}
+              </p>
+            </motion.div>
           ))}
-        </Row>
+        </div>
 
-        {/* Bottom CTA */}
+        {/* Additional Benefits */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100"
         >
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 border-0">
-            <div className="text-white">
-              <Title level={3} className="text-white mb-4">
-                Ready to Experience Fresh Produce?
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <Title level={3} className="!text-3xl !font-bold !text-gray-900 !mb-6">
+                Every Product is Carefully Selected
               </Title>
-              <Text className="text-green-100 text-lg mb-6 block">
-                Join thousands of satisfied customers who trust KrishiConnect for their daily fresh produce needs.
-              </Text>
-              <Space size="large">
-                <motion.a
-                  href="/products"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-block"
-                >
-                  <button className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
-                    Start Shopping
-                  </button>
-                </motion.a>
-                <motion.a
-                  href="/register"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-block"
-                >
-                  <button className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors duration-200">
-                    Join as Farmer
-                  </button>
-                </motion.a>
-              </Space>
+              <div className="space-y-4">
+                {benefits.map((benefit, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <CheckCircleOutlined className="text-white" />
+                    </div>
+                    <span className="text-lg text-gray-700 font-medium">
+                      {benefit}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </Card>
+            <div className="relative">
+              <div className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-3xl p-8 text-white text-center">
+                <div className="text-6xl font-bold mb-2">10K+</div>
+                <div className="text-xl mb-6">Happy Customers</div>
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="bg-white bg-opacity-20 rounded-xl p-4">
+                    <div className="text-3xl font-bold">500+</div>
+                    <div className="text-sm">Farmers</div>
+                  </div>
+                  <div className="bg-white bg-opacity-20 rounded-xl p-4">
+                    <div className="text-3xl font-bold">50K+</div>
+                    <div className="text-sm">Orders</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

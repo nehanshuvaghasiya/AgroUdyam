@@ -3,6 +3,7 @@ import api, { apiCall } from './api';
 export const authService = {
   // Register new user
   register: async (userData) => {
+    console.log("userData",userData);
     return apiCall(() => api.post('/auth/register', userData));
   },
 

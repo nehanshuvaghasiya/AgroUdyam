@@ -89,7 +89,7 @@ const inviteStaff = asyncHandler(async (req, res) => {
   try {
     await sendEmail({
       to: email,
-      subject: 'Invitation to join farm on KrishiConnect',
+      subject: 'Invitation to join farm on AgroUdyam',
       template: EMAIL_TEMPLATES.STAFF_INVITATION,
       data: {
         email,

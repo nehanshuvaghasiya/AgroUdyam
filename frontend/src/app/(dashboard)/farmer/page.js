@@ -7,11 +7,11 @@ import {
   Button, 
   Table, 
   Space,
-  Alert,
   Modal,
   Form,
   Input,
-  Select
+  Select,
+  message
 } from '@/components/ui';
 import { 
   Row, 
@@ -25,22 +25,18 @@ import {
   Badge,
   Tooltip,
   Dropdown,
-  Menu,
   Tabs,
-  Empty,
-  Spin
+  Spin,
+  Upload
 } from 'antd';
 import { 
   ShoppingCartOutlined,
   DollarOutlined,
-  UserOutlined,
   PlusOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
-  TrophyOutlined,
   RiseOutlined,
-  CalendarOutlined,
   BellOutlined,
   SettingOutlined,
   LogoutOutlined,
@@ -48,7 +44,6 @@ import {
   MenuUnfoldOutlined,
   BarChartOutlined,
   FileTextOutlined,
-  TeamOutlined,
   WalletOutlined,
   EnvironmentOutlined,
   ClockCircleOutlined,
@@ -56,51 +51,183 @@ import {
   ExclamationCircleOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
-  HeartOutlined,
   StarOutlined,
-  MessageOutlined,
-  ShareAltOutlined,
-  DownloadOutlined,
-  FilterOutlined,
-  SearchOutlined,
-  MoreOutlined,
+  UserOutlined,
   AppstoreOutlined,
-  ShopOutlined,
-  GlobalOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  HomeOutlined,
-  SafetyOutlined,
-  ThunderboltOutlined,
-  FireOutlined,
-  CrownOutlined,
-  GiftOutlined,
-  ExperimentOutlined,
-  BulbOutlined,
-  RocketOutlined
+  TeamOutlined,
+  DownloadOutlined,
+  TrophyOutlined,
+  UploadOutlined
 } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
+import { productService } from '@/services/product.service';
+import { orderService } from '@/services/order.service';
+import { walletService } from '@/services/wallet.service';
+import { farmService } from '@/services/farm.service';
 import './dashboard.css';
 
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 
 export default function FarmerDashboard() {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddProduct, setShowAddProduct] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
+  
+  // Real data states
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    monthlySales: 0,
+    activeOrders: 0,
+    totalRevenue: 0,
+    rating: 0,
+    farmVisits: 0
+  });
+  const [products, setProducts] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [topProducts, setTopProducts] = useState([]);
+  
+  const [productForm] = Form.useForm();
 
-  // Enhanced stats data with better metrics
-  const stats = [
+  // Fetch dashboard data
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      // Fetch products
+      const productsRes = await productService.getFarmerProducts({ limit: 100 });
+      if (productsRes.success) {
+        setProducts(productsRes.data.products || []);
+        setStats(prev => ({ ...prev, totalProducts: productsRes.data.products?.length || 0 }));
+        
+        // Calculate top products
+        const sortedProducts = [...(productsRes.data.products || [])]
+          .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0))
+          .slice(0, 3);
+        setTopProducts(sortedProducts);
+      }
+
+      // Fetch orders
+      const ordersRes = await orderService.getFarmerOrders({ limit: 10 });
+      if (ordersRes.success) {
+        setRecentOrders(ordersRes.data.orders || []);
+        
+        // Calculate stats from orders
+        const orders = ordersRes.data.orders || [];
+        const activeCount = orders.filter(o => ['pending', 'confirmed', 'processing'].includes(o.status)).length;
+        const monthlyOrders = orders.filter(o => {
+          const orderDate = new Date(o.createdAt);
+          const now = new Date();
+          return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+        });
+        
+        const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        
+        setStats(prev => ({ 
+          ...prev, 
+          activeOrders: activeCount,
+          monthlySales: monthlyOrders.length,
+          totalRevenue: monthlyRevenue,
+          rating: 4.8 // Mock rating for now
+        }));
+      }
+
+      // Fetch wallet balance
+      const walletRes = await walletService.getWalletBalance();
+      if (walletRes.success) {
+        setWalletBalance(walletRes.data.balance || 0);
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      message.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle product creation
+  const handleCreateProduct = async (values) => {
+    try {
+      const formData = new FormData();
+      Object.keys(values).forEach(key => {
+        if (key === 'images' && values[key]) {
+          values[key].fileList.forEach(file => {
+            formData.append('images', file.originFileObj);
+          });
+        } else {
+          formData.append(key, values[key]);
+        }
+      });
+
+      const result = await productService.createProduct(formData);
+      if (result.success) {
+        message.success('Product created successfully!');
+        setShowAddProduct(false);
+        productForm.resetFields();
+        fetchDashboardData();
+      } else {
+        message.error(result.message || 'Failed to create product');
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      message.error('Failed to create product');
+    }
+  };
+
+  // Handle product deletion
+  const handleDeleteProduct = async (productId) => {
+    try {
+      const result = await productService.deleteProduct(productId);
+      if (result.success) {
+        message.success('Product deleted successfully!');
+        fetchDashboardData();
+      } else {
+        message.error(result.message || 'Failed to delete product');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      message.error('Failed to delete product');
+    }
+  };
+
+  // Handle order status update
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const result = await orderService.updateOrderStatus(orderId, { status: newStatus });
+      if (result.success) {
+        message.success('Order status updated successfully!');
+        fetchDashboardData();
+      } else {
+        message.error(result.message || 'Failed to update order status');
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      message.error('Failed to update order status');
+    }
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  // Enhanced stats data with real values
+  const statsCards = [
     {
       title: 'Total Products',
-      value: 24,
+      value: stats.totalProducts,
       change: '+12%',
       changeType: 'increase',
       icon: <AppstoreOutlined />,
@@ -110,7 +237,7 @@ export default function FarmerDashboard() {
     },
     {
       title: 'Monthly Sales',
-      value: 156,
+      value: stats.monthlySales,
       change: '+8%',
       changeType: 'increase',
       icon: <DollarOutlined />,
@@ -120,7 +247,7 @@ export default function FarmerDashboard() {
     },
     {
       title: 'Active Orders',
-      value: 8,
+      value: stats.activeOrders,
       change: '-2%',
       changeType: 'decrease',
       icon: <ClockCircleOutlined />,
@@ -130,7 +257,7 @@ export default function FarmerDashboard() {
     },
     {
       title: 'Total Revenue',
-      value: 45680,
+      value: stats.totalRevenue,
       prefix: '₹',
       change: '+15%',
       changeType: 'increase',
@@ -140,8 +267,19 @@ export default function FarmerDashboard() {
       description: 'Revenue generated this month'
     },
     {
+      title: 'Wallet Balance',
+      value: walletBalance,
+      prefix: '₹',
+      change: '+10%',
+      changeType: 'increase',
+      icon: <WalletOutlined />,
+      color: '#13c2c2',
+      bgColor: 'linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%)',
+      description: 'Available balance in wallet'
+    },
+    {
       title: 'Customer Rating',
-      value: 4.8,
+      value: stats.rating,
       suffix: '/5',
       change: '+0.2',
       changeType: 'increase',
@@ -149,88 +287,6 @@ export default function FarmerDashboard() {
       color: '#f59e0b',
       bgColor: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
       description: 'Average customer satisfaction'
-    },
-    {
-      title: 'Farm Visits',
-      value: 23,
-      change: '+18%',
-      changeType: 'increase',
-      icon: <EnvironmentOutlined />,
-      color: '#10b981',
-      bgColor: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-      description: 'Farm tours booked this week'
-    }
-  ];
-
-  const recentOrders = [
-    {
-      key: '1',
-      orderId: '#ORD-001',
-      customer: 'John Doe',
-      customerAvatar: 'JD',
-      product: 'Fresh Tomatoes',
-      quantity: '5kg',
-      amount: '₹600',
-      status: 'pending',
-      date: '2024-01-15',
-      priority: 'high'
-    },
-    {
-      key: '2',
-      orderId: '#ORD-002',
-      customer: 'Jane Smith',
-      customerAvatar: 'JS',
-      product: 'Organic Spinach',
-      quantity: '2kg',
-      amount: '₹200',
-      status: 'shipped',
-      date: '2024-01-14',
-      priority: 'medium'
-    },
-    {
-      key: '3',
-      orderId: '#ORD-003',
-      customer: 'Mike Johnson',
-      customerAvatar: 'MJ',
-      product: 'Fresh Carrots',
-      quantity: '3kg',
-      amount: '₹240',
-      status: 'delivered',
-      date: '2024-01-13',
-      priority: 'low'
-    },
-    {
-      key: '4',
-      orderId: '#ORD-004',
-      customer: 'Sarah Wilson',
-      customerAvatar: 'SW',
-      product: 'Organic Potatoes',
-      quantity: '4kg',
-      amount: '₹320',
-      status: 'processing',
-      date: '2024-01-12',
-      priority: 'high'
-    }
-  ];
-
-  const topProducts = [
-    {
-      name: 'Fresh Tomatoes',
-      sales: 45,
-      revenue: '₹5,400',
-      growth: '+12%'
-    },
-    {
-      name: 'Organic Spinach',
-      sales: 32,
-      revenue: '₹3,200',
-      growth: '+8%'
-    },
-    {
-      name: 'Fresh Carrots',
-      sales: 28,
-      revenue: '₹2,240',
-      growth: '+15%'
     }
   ];
 
@@ -241,60 +297,65 @@ export default function FarmerDashboard() {
       render: (_, record) => (
         <div className="flex items-center space-x-3">
           <Avatar size="small" style={{ backgroundColor: '#52c41a' }}>
-            {record.customerAvatar}
+            {record.customer?.name?.charAt(0) || 'U'}
           </Avatar>
           <div>
-            <div className="font-medium text-gray-900">{record.orderId}</div>
-            <div className="text-sm text-gray-500">{record.customer}</div>
+            <div className="font-medium text-gray-900">#{record._id?.slice(-8)}</div>
+            <div className="text-sm text-gray-500">{record.customer?.name || 'Customer'}</div>
           </div>
         </div>
       ),
     },
     {
-      title: 'Product',
-      dataIndex: 'product',
-      key: 'product',
-      render: (product, record) => (
+      title: 'Products',
+      dataIndex: 'products',
+      key: 'products',
+      render: (products) => (
         <div>
-          <div className="font-medium text-gray-900">{product}</div>
-          <div className="text-sm text-gray-500">{record.quantity}</div>
+          <div className="font-medium text-gray-900">{products?.length || 0} items</div>
+          <div className="text-sm text-gray-500">
+            {products?.[0]?.product?.name || 'Multiple products'}
+          </div>
         </div>
       ),
     },
     {
       title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
       render: (amount) => (
-        <div className="font-semibold text-gray-900">{amount}</div>
+        <div className="font-semibold text-gray-900">₹{amount?.toLocaleString() || 0}</div>
       ),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status, record) => {
+      render: (status) => {
         const statusConfig = {
           pending: { color: 'orange', icon: <ClockCircleOutlined /> },
-          processing: { color: 'blue', icon: <ExclamationCircleOutlined /> },
-          shipped: { color: 'cyan', icon: <EnvironmentOutlined /> },
+          confirmed: { color: 'blue', icon: <ExclamationCircleOutlined /> },
+          processing: { color: 'cyan', icon: <ExclamationCircleOutlined /> },
+          shipped: { color: 'purple', icon: <EnvironmentOutlined /> },
           delivered: { color: 'green', icon: <CheckCircleOutlined /> },
           cancelled: { color: 'red', icon: <ExclamationCircleOutlined /> }
         };
         const config = statusConfig[status] || statusConfig.pending;
         return (
           <Tag color={config.color} icon={config.icon}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status?.charAt(0).toUpperCase() + status?.slice(1)}
           </Tag>
         );
       }
     },
     {
       title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (date) => (
-        <div className="text-sm text-gray-600">{date}</div>
+        <div className="text-sm text-gray-600">
+          {date ? new Date(date).toLocaleDateString() : 'N/A'}
+        </div>
       ),
     },
     {
@@ -303,11 +364,36 @@ export default function FarmerDashboard() {
       render: (_, record) => (
         <Space>
           <Tooltip title="View Details">
-            <Button type="text" icon={<EyeOutlined />} size="small" />
+            <Button 
+              type="text" 
+              icon={<EyeOutlined />} 
+              size="small"
+              onClick={() => router.push(`/farmer/orders/${record._id}`)}
+            />
           </Tooltip>
-          <Tooltip title="Edit Order">
-            <Button type="text" icon={<EditOutlined />} size="small" />
-          </Tooltip>
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: 'confirmed',
+                  label: 'Mark as Confirmed',
+                  onClick: () => handleUpdateOrderStatus(record._id, 'confirmed'),
+                },
+                {
+                  key: 'processing',
+                  label: 'Mark as Processing',
+                  onClick: () => handleUpdateOrderStatus(record._id, 'processing'),
+                },
+                {
+                  key: 'shipped',
+                  label: 'Mark as Shipped',
+                  onClick: () => handleUpdateOrderStatus(record._id, 'shipped'),
+                },
+              ],
+            }}
+          >
+            <Button type="text" icon={<SettingOutlined />} size="small" />
+          </Dropdown>
         </Space>
       ),
     },
@@ -319,11 +405,13 @@ export default function FarmerDashboard() {
       key: 'profile',
       icon: <UserOutlined />,
       label: 'Profile',
+      onClick: () => router.push('/farmer/profile'),
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
       label: 'Settings',
+      onClick: () => router.push('/farmer/settings'),
     },
     {
       type: 'divider',
@@ -333,8 +421,17 @@ export default function FarmerDashboard() {
       icon: <LogoutOutlined />,
       label: 'Logout',
       danger: true,
+      onClick: handleLogout,
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <ProtectedRoute requiredRoles={['farm_owner', 'farm_manager', 'farm_worker']}>
@@ -356,11 +453,11 @@ export default function FarmerDashboard() {
                   whileHover={{ scale: 1.05, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <span className="text-white font-bold text-xl">K</span>
+                  <span className="text-white font-bold text-xl">A</span>
                 </motion.div>
                 <div>
                   <Title level={3} className="mb-0 text-gray-900 font-bold">
-                    KrishiConnect
+                    AgroUdyam
                   </Title>
                   <Text className="text-gray-500 text-sm font-medium">
                     Professional Farmer Dashboard
@@ -370,31 +467,18 @@ export default function FarmerDashboard() {
             </div>
             
             <div className="flex items-center space-x-6">
-              {/* Time Range Selector */}
-              <Select
-                value={selectedTimeRange}
-                onChange={setSelectedTimeRange}
-                className="w-32"
-                size="large"
-              >
-                <Select.Option value="7d">Last 7 days</Select.Option>
-                <Select.Option value="30d">Last 30 days</Select.Option>
-                <Select.Option value="90d">Last 90 days</Select.Option>
-                <Select.Option value="1y">Last year</Select.Option>
-              </Select>
-              
               {/* Quick Stats */}
               <div className="hidden lg:flex items-center space-x-8">
                 <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900">8</div>
+                  <div className="text-xl font-bold text-gray-900">{stats.activeOrders}</div>
                   <div className="text-xs text-gray-500 font-medium">Active Orders</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl font-bold text-green-600">₹45,680</div>
+                  <div className="text-xl font-bold text-green-600">₹{stats.totalRevenue.toLocaleString()}</div>
                   <div className="text-xs text-gray-500 font-medium">This Month</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl font-bold text-blue-600">4.8★</div>
+                  <div className="text-xl font-bold text-blue-600">{stats.rating}★</div>
                   <div className="text-xs text-gray-500 font-medium">Rating</div>
                 </div>
               </div>
@@ -440,7 +524,7 @@ export default function FarmerDashboard() {
         <Layout>
           {/* Ultra Modern Sidebar */}
           <Sider 
-            width={collapsed ? 80 : 300} 
+            width={collapsed ? 80 : 280} 
             className="bg-white/90 backdrop-blur-md shadow-xl border-r border-gray-200/50 transition-all duration-300"
             collapsed={collapsed}
           >
@@ -448,9 +532,7 @@ export default function FarmerDashboard() {
               <nav className="space-y-3">
                 <Link 
                   href="/farmer" 
-                  className={`flex items-center space-x-4 p-4 rounded-2xl transition-all duration-200 ${
-                    true ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg' : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className="flex items-center space-x-4 p-4 rounded-2xl transition-all duration-200 bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
                 >
                   <BarChartOutlined className="text-xl" />
                   {!collapsed && <span className="font-semibold">Dashboard</span>}
@@ -473,27 +555,19 @@ export default function FarmerDashboard() {
                 </Link>
                 
                 <Link 
-                  href="/farmer/analytics" 
-                  className="flex items-center space-x-4 p-4 rounded-2xl text-gray-700 hover:bg-gray-100 transition-all duration-200"
-                >
-                  <RiseOutlined className="text-xl" />
-                  {!collapsed && <span className="font-medium">Analytics</span>}
-                </Link>
-                
-                <Link 
-                  href="/farmer/finances" 
+                  href="/farmer/wallet" 
                   className="flex items-center space-x-4 p-4 rounded-2xl text-gray-700 hover:bg-gray-100 transition-all duration-200"
                 >
                   <WalletOutlined className="text-xl" />
-                  {!collapsed && <span className="font-medium">Finances</span>}
+                  {!collapsed && <span className="font-medium">Wallet</span>}
                 </Link>
                 
                 <Link 
-                  href="/farmer/customers" 
+                  href="/farmer/farm" 
                   className="flex items-center space-x-4 p-4 rounded-2xl text-gray-700 hover:bg-gray-100 transition-all duration-200"
                 >
-                  <UserOutlined className="text-xl" />
-                  {!collapsed && <span className="font-medium">Customers</span>}
+                  <EnvironmentOutlined className="text-xl" />
+                  {!collapsed && <span className="font-medium">Farm</span>}
                 </Link>
                 
                 <Link 
@@ -502,22 +576,6 @@ export default function FarmerDashboard() {
                 >
                   <TeamOutlined className="text-xl" />
                   {!collapsed && <span className="font-medium">Staff</span>}
-                </Link>
-                
-                <Link 
-                  href="/farmer/marketing" 
-                  className="flex items-center space-x-4 p-4 rounded-2xl text-gray-700 hover:bg-gray-100 transition-all duration-200"
-                >
-                  <RocketOutlined className="text-xl" />
-                  {!collapsed && <span className="font-medium">Marketing</span>}
-                </Link>
-                
-                <Link 
-                  href="/farmer/settings" 
-                  className="flex items-center space-x-4 p-4 rounded-2xl text-gray-700 hover:bg-gray-100 transition-all duration-200"
-                >
-                  <SettingOutlined className="text-xl" />
-                  {!collapsed && <span className="font-medium">Settings</span>}
                 </Link>
               </nav>
               
@@ -587,7 +645,7 @@ export default function FarmerDashboard() {
                     >
                       <div className="flex items-center space-x-2">
                         <CheckCircleOutlined className="text-green-200 text-xl" />
-                        <span className="font-semibold">8 orders pending</span>
+                        <span className="font-semibold">{stats.activeOrders} orders pending</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RiseOutlined className="text-green-200 text-xl" />
@@ -595,7 +653,7 @@ export default function FarmerDashboard() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <StarOutlined className="text-green-200 text-xl" />
-                        <span className="font-semibold">4.8★ customer rating</span>
+                        <span className="font-semibold">{stats.rating}★ customer rating</span>
                       </div>
                     </motion.div>
                   </div>
@@ -613,123 +671,66 @@ export default function FarmerDashboard() {
               </div>
             </motion.div>
 
-            {/* Dashboard Tabs */}
+            {/* Ultra Modern Stats Cards */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mb-8"
+              transition={{ duration: 0.5 }}
             >
-              <Tabs
-                activeKey={activeTab}
-                onChange={setActiveTab}
-                items={[
-                  {
-                    key: 'overview',
-                    label: (
-                      <span className="flex items-center space-x-2">
-                        <BarChartOutlined />
-                        <span>Overview</span>
-                      </span>
-                    ),
-                  },
-                  {
-                    key: 'analytics',
-                    label: (
-                      <span className="flex items-center space-x-2">
-                        <RiseOutlined />
-                        <span>Analytics</span>
-                      </span>
-                    ),
-                  },
-                  {
-                    key: 'products',
-                    label: (
-                      <span className="flex items-center space-x-2">
-                        <AppstoreOutlined />
-                        <span>Products</span>
-                      </span>
-                    ),
-                  },
-                  {
-                    key: 'orders',
-                    label: (
-                      <span className="flex items-center space-x-2">
-                        <FileTextOutlined />
-                        <span>Orders</span>
-                      </span>
-                    ),
-                  },
-                ]}
-                className="modern-tabs"
-              />
-            </motion.div>
-
-            {/* Ultra Modern Stats Cards */}
-            <AnimatePresence>
-              {activeTab === 'overview' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Row gutter={[24, 24]} className="mb-8">
-                    {stats.map((stat, index) => (
-                      <Col xs={24} sm={12} lg={8} xl={4} key={index}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: index * 0.1 }}
-                          whileHover={{ y: -5, scale: 1.02 }}
-                        >
-                          <Card 
-                            className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden bg-white/80 backdrop-blur-sm"
-                            bodyStyle={{ padding: '28px' }}
-                          >
-                            <div className="relative">
-                              <div 
-                                className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-5"
-                                style={{ background: stat.bgColor }}
-                              />
-                              <div className="flex items-start justify-between mb-6">
-                                <div 
-                                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-xl"
-                                  style={{ background: stat.bgColor }}
-                                >
-                                  {stat.icon}
-                                </div>
-                                <div className="flex items-center space-x-1 bg-gray-100 px-3 py-1 rounded-full">
-                                  {stat.changeType === 'increase' ? (
-                                    <ArrowUpOutlined className="text-green-500 text-sm" />
-                                  ) : (
-                                    <ArrowDownOutlined className="text-red-500 text-sm" />
-                                  )}
-                                  <span 
-                                    className={`text-sm font-semibold ${
-                                      stat.changeType === 'increase' ? 'text-green-500' : 'text-red-500'
-                                    }`}
-                                  >
-                                    {stat.change}
-                                  </span>
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-3xl font-bold text-gray-900 mb-2">
-                                  {stat.prefix}{stat.value.toLocaleString()}{stat.suffix}
-                                </div>
-                                <div className="text-gray-700 font-semibold text-lg mb-1">{stat.title}</div>
-                                <div className="text-gray-500 text-sm">{stat.description}</div>
-                              </div>
+              <Row gutter={[24, 24]} className="mb-8">
+                {statsCards.map((stat, index) => (
+                  <Col xs={24} sm={12} lg={8} xl={4} key={index}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      whileHover={{ y: -5, scale: 1.02 }}
+                    >
+                      <Card 
+                        className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden bg-white/80 backdrop-blur-sm"
+                        bodyStyle={{ padding: '28px' }}
+                      >
+                        <div className="relative">
+                          <div 
+                            className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-5"
+                            style={{ background: stat.bgColor }}
+                          />
+                          <div className="flex items-start justify-between mb-6">
+                            <div 
+                              className="w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-xl text-2xl"
+                              style={{ background: stat.bgColor }}
+                            >
+                              {stat.icon}
                             </div>
-                          </Card>
-                        </motion.div>
-                      </Col>
-                    ))}
-                  </Row>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                            <div className="flex items-center space-x-1 bg-gray-100 px-3 py-1 rounded-full">
+                              {stat.changeType === 'increase' ? (
+                                <ArrowUpOutlined className="text-green-500 text-sm" />
+                              ) : (
+                                <ArrowDownOutlined className="text-red-500 text-sm" />
+                              )}
+                              <span 
+                                className={`text-sm font-semibold ${
+                                  stat.changeType === 'increase' ? 'text-green-500' : 'text-red-500'
+                                }`}
+                              >
+                                {stat.change}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-3xl font-bold text-gray-900 mb-2">
+                              {stat.prefix}{stat.value.toLocaleString()}{stat.suffix}
+                            </div>
+                            <div className="text-gray-700 font-semibold text-lg mb-1">{stat.title}</div>
+                            <div className="text-gray-500 text-sm">{stat.description}</div>
+                          </div>
+                        </div>
+                      </Card>
+                    </motion.div>
+                  </Col>
+                ))}
+              </Row>
+            </motion.div>
 
             <Row gutter={[24, 24]}>
               {/* Recent Orders */}
@@ -756,13 +757,21 @@ export default function FarmerDashboard() {
                     className="h-full border-0 shadow-lg"
                     bodyStyle={{ padding: '24px' }}
                   >
-                    <Table
-                      columns={orderColumns}
-                      dataSource={recentOrders}
-                      pagination={false}
-                      size="middle"
-                      className="modern-table"
-                    />
+                    {recentOrders.length > 0 ? (
+                      <Table
+                        columns={orderColumns}
+                        dataSource={recentOrders}
+                        pagination={false}
+                        size="middle"
+                        className="modern-table"
+                        rowKey="_id"
+                      />
+                    ) : (
+                      <div className="text-center py-12">
+                        <FileTextOutlined className="text-6xl text-gray-300 mb-4" />
+                        <p className="text-gray-500">No orders yet</p>
+                      </div>
+                    )}
                   </Card>
                 </motion.div>
               </Col>
@@ -786,37 +795,43 @@ export default function FarmerDashboard() {
                       className="border-0 shadow-lg"
                       bodyStyle={{ padding: '24px' }}
                     >
-                      <List
-                        dataSource={topProducts}
-                        renderItem={(item, index) => (
-                          <List.Item className="border-0 py-3">
-                            <div className="w-full">
-                              <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center space-x-3">
-                                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                    <span className="text-green-600 font-bold text-sm">#{index + 1}</span>
+                      {topProducts.length > 0 ? (
+                        <List
+                          dataSource={topProducts}
+                          renderItem={(item, index) => (
+                            <List.Item className="border-0 py-3">
+                              <div className="w-full">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                      <span className="text-green-600 font-bold text-sm">#{index + 1}</span>
+                                    </div>
+                                    <div>
+                                      <div className="font-semibold text-gray-900">{item.name}</div>
+                                      <div className="text-sm text-gray-500">{item.salesCount || 0} sales</div>
+                                    </div>
                                   </div>
-                                  <div>
-                                    <div className="font-semibold text-gray-900">{item.name}</div>
-                                    <div className="text-sm text-gray-500">{item.sales} sales</div>
+                                  <div className="text-right">
+                                    <div className="font-semibold text-gray-900">₹{item.price}</div>
                                   </div>
                                 </div>
-                                <div className="text-right">
-                                  <div className="font-semibold text-gray-900">{item.revenue}</div>
-                                  <div className="text-sm text-green-600 font-medium">{item.growth}</div>
-                                </div>
+                                <Progress 
+                                  percent={((item.salesCount || 0) / 50) * 100} 
+                                  size="small" 
+                                  showInfo={false}
+                                  strokeColor="#52c41a"
+                                  trailColor="#f0f0f0"
+                                />
                               </div>
-                              <Progress 
-                                percent={(item.sales / 50) * 100} 
-                                size="small" 
-                                showInfo={false}
-                                strokeColor="#52c41a"
-                                trailColor="#f0f0f0"
-                              />
-                            </div>
-                          </List.Item>
-                        )}
-                      />
+                            </List.Item>
+                          )}
+                        />
+                      ) : (
+                        <div className="text-center py-8">
+                          <AppstoreOutlined className="text-6xl text-gray-300 mb-4" />
+                          <p className="text-gray-500">No products yet</p>
+                        </div>
+                      )}
                     </Card>
                   </motion.div>
 
@@ -837,36 +852,30 @@ export default function FarmerDashboard() {
                       bodyStyle={{ padding: '24px' }}
                     >
                       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                        <Link href="/farmer/products/new">
-                          <Button 
-                            type="primary" 
-                            icon={<PlusOutlined />}
-                            size="large"
-                            className="w-full h-12 bg-green-500 hover:bg-green-600 border-green-500 hover:border-green-600"
-                          >
-                            Add New Product
-                          </Button>
-                        </Link>
+                        <Button 
+                          type="primary" 
+                          icon={<PlusOutlined />}
+                          size="large"
+                          className="w-full h-12 bg-green-500 hover:bg-green-600 border-green-500 hover:border-green-600"
+                          onClick={() => setShowAddProduct(true)}
+                        >
+                          Add New Product
+                        </Button>
                         <Button 
                           icon={<EyeOutlined />} 
                           size="large"
                           className="w-full h-12"
+                          onClick={() => router.push('/farmer/orders')}
                         >
                           View All Orders
-                        </Button>
-                        <Button 
-                          icon={<RiseOutlined />} 
-                          size="large"
-                          className="w-full h-12"
-                        >
-                          View Analytics
                         </Button>
                         <Button 
                           icon={<WalletOutlined />} 
                           size="large"
                           className="w-full h-12"
+                          onClick={() => router.push('/farmer/wallet')}
                         >
-                          Request Payout
+                          Manage Wallet
                         </Button>
                       </Space>
                     </Card>
@@ -877,52 +886,119 @@ export default function FarmerDashboard() {
 
             {/* Add Product Modal */}
             <Modal
-              title="Add New Product"
+              title={
+                <div className="flex items-center space-x-2">
+                  <PlusOutlined className="text-green-500" />
+                  <span>Add New Product</span>
+                </div>
+              }
               open={showAddProduct}
-              onCancel={() => setShowAddProduct(false)}
+              onCancel={() => {
+                setShowAddProduct(false);
+                productForm.resetFields();
+              }}
               footer={null}
-              width={600}
+              width={700}
               className="modern-modal"
             >
-              <Form layout="vertical" className="space-y-4">
+              <Form 
+                form={productForm}
+                layout="vertical" 
+                onFinish={handleCreateProduct}
+                className="space-y-4"
+              >
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Form.Item label="Product Name" name="name" rules={[{ required: true }]}>
+                    <Form.Item 
+                      label="Product Name" 
+                      name="name" 
+                      rules={[{ required: true, message: 'Please enter product name' }]}
+                    >
                       <Input placeholder="Enter product name" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item label="Category" name="category" rules={[{ required: true }]}>
+                    <Form.Item 
+                      label="Category" 
+                      name="category" 
+                      rules={[{ required: true, message: 'Please select category' }]}
+                    >
                       <Select placeholder="Select category" size="large">
                         <Select.Option value="vegetables">Vegetables</Select.Option>
                         <Select.Option value="fruits">Fruits</Select.Option>
                         <Select.Option value="grains">Grains</Select.Option>
                         <Select.Option value="herbs">Herbs</Select.Option>
+                        <Select.Option value="dairy">Dairy</Select.Option>
                       </Select>
                     </Form.Item>
                   </Col>
                 </Row>
                 <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item label="Price (₹)" name="price" rules={[{ required: true }]}>
-                      <Input placeholder="Enter price" size="large" />
+                  <Col span={8}>
+                    <Form.Item 
+                      label="Price (₹)" 
+                      name="price" 
+                      rules={[{ required: true, message: 'Please enter price' }]}
+                    >
+                      <Input type="number" placeholder="Enter price" size="large" />
                     </Form.Item>
                   </Col>
-                  <Col span={12}>
-                    <Form.Item label="Stock Quantity" name="stock" rules={[{ required: true }]}>
-                      <Input placeholder="Enter stock" size="large" />
+                  <Col span={8}>
+                    <Form.Item 
+                      label="Quantity" 
+                      name="quantity" 
+                      rules={[{ required: true, message: 'Please enter quantity' }]}
+                    >
+                      <Input type="number" placeholder="Enter quantity" size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item 
+                      label="Unit" 
+                      name="unit" 
+                      rules={[{ required: true, message: 'Please select unit' }]}
+                    >
+                      <Select placeholder="Select unit" size="large">
+                        <Select.Option value="kg">Kilogram (kg)</Select.Option>
+                        <Select.Option value="g">Gram (g)</Select.Option>
+                        <Select.Option value="l">Liter (l)</Select.Option>
+                        <Select.Option value="piece">Piece</Select.Option>
+                        <Select.Option value="bunch">Bunch</Select.Option>
+                      </Select>
                     </Form.Item>
                   </Col>
                 </Row>
                 <Form.Item label="Description" name="description">
                   <Input.TextArea rows={4} placeholder="Enter product description" />
                 </Form.Item>
-                <div className="flex justify-end space-x-3">
-                  <Button onClick={() => setShowAddProduct(false)}>
+                <Form.Item label="Tags (comma separated)" name="tags">
+                  <Input placeholder="organic, fresh, local" />
+                </Form.Item>
+                <Form.Item label="Product Images" name="images">
+                  <Upload
+                    listType="picture-card"
+                    maxCount={5}
+                    beforeUpload={() => false}
+                  >
+                    <div>
+                      <UploadOutlined />
+                      <div style={{ marginTop: 8 }}>Upload</div>
+                    </div>
+                  </Upload>
+                </Form.Item>
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button onClick={() => {
+                    setShowAddProduct(false);
+                    productForm.resetFields();
+                  }}>
                     Cancel
                   </Button>
-                  <Button type="primary" className="bg-green-500 hover:bg-green-600">
-                    Add Product
+                  <Button 
+                    type="primary" 
+                    htmlType="submit"
+                    className="bg-green-500 hover:bg-green-600"
+                  >
+                    Create Product
                   </Button>
                 </div>
               </Form>

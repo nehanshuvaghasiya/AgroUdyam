@@ -9,7 +9,7 @@ cloudinary.config({
 });
 
 // Upload single image
-const uploadToCloudinary = async (filePath, folder = 'krishiconnect') => {
+const uploadToCloudinary = async (filePath, folder = 'agroudyam') => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
       folder: folder,
@@ -32,7 +32,7 @@ const uploadToCloudinary = async (filePath, folder = 'krishiconnect') => {
 };
 
 // Upload multiple images
-const uploadMultipleToCloudinary = async (filePaths, folder = 'krishiconnect') => {
+const uploadMultipleToCloudinary = async (filePaths, folder = 'agroudyam') => {
   try {
     const uploadPromises = filePaths.map(filePath => uploadToCloudinary(filePath, folder));
     const results = await Promise.all(uploadPromises);

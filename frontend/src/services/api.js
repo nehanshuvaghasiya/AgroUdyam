@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/v1',
+  baseURL:  'http://localhost:8081/api/v1',
   timeout: 5000, // Reduced timeout for faster fallback
   headers: {
     'Content-Type': 'application/json',

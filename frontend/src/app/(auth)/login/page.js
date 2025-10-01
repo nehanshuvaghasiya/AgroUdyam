@@ -108,7 +108,7 @@ export default function LoginPage() {
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="w-20 h-20 bg-gradient-to-r from-green-500 via-green-600 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto lg:mx-0 mb-8 shadow-2xl"
               >
-                <span className="text-white font-bold text-3xl">K</span>
+                <span className="text-white font-bold text-3xl">A</span>
               </motion.div>
 
               <motion.h1 
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                KrishiConnect
+                AgroUdyam
               </motion.h1>
 
               <motion.p 

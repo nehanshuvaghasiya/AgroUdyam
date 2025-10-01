@@ -1,4 +1,4 @@
-// Theme Configuration for KrishiConnect
+// Theme Configuration for AgroUdyam
 import { theme } from 'antd';
 
 // Custom theme configuration

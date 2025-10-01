@@ -1,6 +1,6 @@
-# KrishiConnect Frontend
+# AgroUdyam Frontend
 
-A modern, responsive Next.js frontend application for KrishiConnect - a platform connecting farmers with customers for fresh produce delivery.
+A modern, responsive Next.js frontend application for AgroUdyam - a platform connecting farmers with customers for fresh produce delivery.
 
 ## 🚀 Features
 
@@ -168,7 +168,7 @@ frontend/
    ```env
    # API Configuration
    NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
-   NEXT_PUBLIC_APP_NAME=KrishiConnect
+   NEXT_PUBLIC_APP_NAME=AgroUdyam
    
    # External Services
    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
@@ -326,8 +326,8 @@ npm start
 ### Environment Variables (Production)
 ```env
 NODE_ENV=production
-NEXT_PUBLIC_API_URL=https://api.krishiconnect.com/api/v1
-NEXT_PUBLIC_APP_URL=https://krishiconnect.com
+NEXT_PUBLIC_API_URL=https://api.agroudyam.com/api/v1
+NEXT_PUBLIC_APP_URL=https://agroudyam.com
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=production-cloudinary
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_live_key
 ```
@@ -352,7 +352,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-For support, email frontend@krishiconnect.com or create an issue in the repository.
+For support, email frontend@agroudyam.com or create an issue in the repository.
 
 ---
 
